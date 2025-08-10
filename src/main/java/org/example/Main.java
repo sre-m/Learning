@@ -1,0 +1,22 @@
+package org.example;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
+import java.util.Scanner;
+
+//TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
+// click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
+public class Main {
+    public static void main(String[] args) throws FileNotFoundException {
+        var config = AppConfig.load("config.yaml");
+        var scanner = new Scanner(System.in);
+        var library = new Library();
+        var logFile = new File(config.getStorage().getLogfile());
+        logFile.getParentFile().mkdirs();
+        var printStream = new PrintStream(new FileOutputStream(logFile),true);
+        var commandHandler = new CommandHandler(library,scanner, printStream);
+        while (true) commandHandler.processCommand(scanner.next());
+    }
+}
