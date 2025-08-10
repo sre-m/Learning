@@ -1,2 +1,2 @@
 storage:
-  logfile: "target/logs/user.log"
+  logfile: "target/logs/user1.log"

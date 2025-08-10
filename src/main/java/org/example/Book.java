@@ -56,4 +56,12 @@ public class Book {
                 ", releaseDate: " + releaseDate +
                 ", status: " + status + "]";
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Book book = (Book) o;
+        return book.getTitle().equals(title) && book.getAuthor().equals(author) && book.getReleaseDate() == releaseDate && book.getStatus().equals(status);
+    }
 }

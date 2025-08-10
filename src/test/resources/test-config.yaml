@@ -1,0 +1,2 @@
+storage:
+  logfile: "logs/app.log"

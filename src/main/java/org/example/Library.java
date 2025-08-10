@@ -4,7 +4,7 @@ import java.util.Comparator;
 import java.util.List;
 
 public class Library {
-    private List<Book> books;
+    private final List<Book> books;
 
     public List<Book> getBooks() {
         return books;

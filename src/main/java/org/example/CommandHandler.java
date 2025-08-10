@@ -1,58 +1,58 @@
 package org.example;
 
 import java.io.*;
-import java.util.Scanner;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class CommandHandler {
     private final Library library;
-    private final Scanner scanner;
     private final PrintStream fileOut;
 
-    public CommandHandler(Library library, Scanner scanner, PrintStream fileOut) {
+    public CommandHandler(Library library, PrintStream fileOut) {
         this.library = library;
-        this.scanner = scanner;
         this.fileOut = fileOut;
     }
 
-    public void processCommand(String cmd) {
+    public void processCommand(String cmd, Queue<String> args) {
         switch (cmd) {
             case "add" -> {
-                var title = scanner.next();
-                var author = scanner.next();
-                var releaseDate = scanner.nextInt();
-                var status = BookStatus.valueOf(scanner.next().toUpperCase());
-                fileOut.println(cmd + title + " " + author + " " + releaseDate + " " + status);
+                var title = args.poll();
+                var author = args.poll();
+                var releaseDate = Integer.parseInt(args.poll());
+                var status = BookStatus.valueOf(args.poll().toUpperCase());
+                fileOut.println(cmd + " " + title + " " + author + " " + releaseDate + " " + status);
                 library.addBook(new Book(title, author, releaseDate, status));
             }
             case "remove" -> {
-                var index = scanner.nextInt();
+                var index = Integer.parseInt(args.poll());
                 fileOut.println("remove " + index);
                 library.removeBook(index);
             }
             case "edit" -> {
-                var title = scanner.next();
-                var author = scanner.next();
-                var releaseDate = scanner.nextInt();
-                var status = BookStatus.valueOf(scanner.next().toUpperCase());
+                var title = args.poll();
+                var author = args.poll();
+                var releaseDate = Integer.parseInt(args.poll());
+                var status = BookStatus.valueOf(args.poll().toUpperCase());
                 fileOut.println("edit " + title + " " + author + " " + releaseDate + " " + status);
-                library.getBook(scanner.nextInt())
-                        .setTitle(scanner.next()).setAuthor(scanner.next())
-                        .setReleaseDate(scanner.nextInt())
-                        .setStatus(BookStatus.valueOf(scanner.next().toUpperCase()));
+                library.getBook(Integer.parseInt(args.poll()))
+                        .setTitle(args.poll()).setAuthor(args.poll())
+                        .setReleaseDate(Integer.parseInt(args.poll()))
+                        .setStatus(BookStatus.valueOf(args.poll().toUpperCase()));
             }
             case "search" -> {
-                String type = scanner.next();
-                String query = scanner.next();
+                String type = args.poll();
+                String query = args.poll();
                 fileOut.println("search " + type + " " + query);
                 handleSearch(type, query);
             }
             case "read" -> {
-                var fileName = scanner.next();
+                var fileName = args.poll();
                 fileOut.println("read " + fileName);
                 readFile(fileName);
             }
             case "write" -> {
-                var fileName = scanner.next();
+                var fileName = args.poll();
                 fileOut.println("write " + fileName);
                 writeFile(fileName);
             }
@@ -75,7 +75,7 @@ public class CommandHandler {
         }
     }
 
-    private void handleSearch(String type,String query) {
+    private void handleSearch(String type, String query) {
         fileOut.println("search " + type + " " + query);
         var list = library.getBooks();
         var indexes = type.equals("author") ? library.searchBooksByAuthorIndexes(query)
@@ -105,6 +105,8 @@ public class CommandHandler {
     }
 
     private void writeFile(String filename) {
+        File file = new File(filename);
+        file.getParentFile().mkdirs();
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(filename))) {
             for (Book b : library.getBooks()) {
                 bw.write(b.getTitle() + "," + b.getAuthor() + "," + b.getReleaseDate() + "," + b.getStatus());
