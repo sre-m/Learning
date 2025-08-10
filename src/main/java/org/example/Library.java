@@ -1,5 +1,4 @@
 package org.example;
-import java.util.LinkedList;
 import java.util.Comparator;
 import java.util.List;
 
@@ -11,7 +10,7 @@ public class Library {
     }
 
     public Library() {
-        books = new LinkedList<>();
+        books = new LinkedList2<>();
     }
 
     public Book getBook(int index) {
@@ -36,7 +35,7 @@ public class Library {
 
     public List<Book> searchBooksByTitle(String title) {
         title = title.toLowerCase();
-        List<Book> books = new LinkedList<>();
+        List<Book> books = new LinkedList2<>();
         for (Book book : this.books) {
             if (book.getTitle().toLowerCase().contains(title))
                 books.add(book);
@@ -48,7 +47,7 @@ public class Library {
     public List<Integer> searchBooksByTitleIndexes(String title) {
         title = title.toLowerCase();
         var bookList = this.getBooks();
-        List<Integer> bookIndexes = new LinkedList<>();
+        List<Integer> bookIndexes = new LinkedList2<>();
         for (int i = 0; i < bookList.size(); i++) {
             if (bookList.get(i).getTitle().toLowerCase().contains(title)) {
                 bookIndexes.add(i);
@@ -59,7 +58,7 @@ public class Library {
 
     public List<Book> searchBooksByAuthor(String author) {
         author = author.toLowerCase();
-        List<Book> books = new LinkedList<>();
+        List<Book> books = new LinkedList2<>();
         for (Book book : this.books) {
             if (book.getAuthor().toLowerCase().contains(author))
                 books.add(book);
@@ -71,7 +70,7 @@ public class Library {
     public List<Integer> searchBooksByAuthorIndexes(String author) {
         author = author.toLowerCase();
         var bookList = this.getBooks();
-        List<Integer> bookIndexes = new LinkedList<>();
+        List<Integer> bookIndexes = new LinkedList2<>();
         for (int i = 0; i < bookList.size(); i++) {
             if (bookList.get(i).getAuthor().toLowerCase().contains(author)) {
                 bookIndexes.add(i);
