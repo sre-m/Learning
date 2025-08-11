@@ -1,4 +1,4 @@
-package org.example;
+package org.example.util;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -161,7 +161,8 @@ public class LinkedList2<T> extends AbstractSequentialList<T> implements List<T>
             @Override
             public void remove() {
                 if (lastReturned == null) throw new IllegalStateException();
-                LinkedList2.this.removeByIndex(pos - (current == lastReturned.next ? 1 : 0));
+                prev.next = current.next;
+//                LinkedList2.this.removeByIndex(pos - (current == lastReturned.next ? 1 : 0));
                 if (current == lastReturned) current = current.next;
                 lastReturned = null;
                 pos--;

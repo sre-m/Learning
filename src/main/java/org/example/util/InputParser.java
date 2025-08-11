@@ -1,4 +1,4 @@
-package org.example;
+package org.example.util;
 
 import java.util.Queue;
 import java.util.regex.Matcher;

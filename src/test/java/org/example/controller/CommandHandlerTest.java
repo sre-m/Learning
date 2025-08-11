@@ -1,16 +1,19 @@
-package org.example;
+package org.example.controller;
 
+import org.example.model.Asset;
+import org.example.model.Book;
+import org.example.model.BookStatus;
+import org.example.service.Library;
+import org.example.util.InputParser;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.*;
 import java.nio.file.Files;
-import java.util.Scanner;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class CommandHandlerTest {
-
     private Library library;
     private ByteArrayOutputStream outContent;
 
@@ -29,12 +32,12 @@ class CommandHandlerTest {
         CommandHandler handler = createHandlerWithInput();
         handler.processCommand("add", InputParser.parseQuotedInput("Title Author 2000 EXIST"));
 
-        assertEquals(1, library.getBooks().size());
-        Book book = library.getBook(0);
-        assertEquals("Title", book.getTitle());
-        assertEquals("Author", book.getAuthor());
-        assertEquals(2000, book.getReleaseDate());
-        assertEquals(BookStatus.EXIST, book.getStatus());
+        assertEquals(1, library.getAssets().size());
+        Asset asset = library.getAsset(0);
+        assertEquals("Title", asset.getTitle());
+        assertEquals("Author", asset.getAuthor());
+        assertEquals(2000, asset.getReleaseDate());
+        assertEquals(BookStatus.EXIST, ((Book)asset).getStatus());
         assertTrue(outContent.toString().contains("add Title Author 2000 EXIST"));
     }
 
@@ -43,46 +46,46 @@ class CommandHandlerTest {
         CommandHandler handler = createHandlerWithInput();
         handler.processCommand("add", InputParser.parseQuotedInput("\"The Lord of the Rings\" \"J.R.R. Tolkien\" 2000 EXIST"));
 
-        assertEquals(1, library.getBooks().size());
-        Book book = library.getBook(0);
-        assertEquals("The Lord of the Rings", book.getTitle());
-        assertEquals("J.R.R. Tolkien", book.getAuthor());
-        assertEquals(2000, book.getReleaseDate());
-        assertEquals(BookStatus.EXIST, book.getStatus());
+        assertEquals(1, library.getAssets().size());
+        Asset asset = library.getAsset(0);
+        assertEquals("The Lord of the Rings", asset.getTitle());
+        assertEquals("J.R.R. Tolkien", asset.getAuthor());
+        assertEquals(2000, asset.getReleaseDate());
+        assertEquals(BookStatus.EXIST, ((Book)asset).getStatus());
         System.out.println(outContent.toString());
         assertTrue(outContent.toString().contains("add The Lord of the Rings J.R.R. Tolkien 2000 EXIST"));
     }
 
     @Test
     void processCommand_remove_removesBookByIndex() {
-        library.addBook(new Book("T", "A", 2000, BookStatus.EXIST));
+        library.addAsset(new Book("T", "A", 2000, BookStatus.EXIST));
         CommandHandler handler = createHandlerWithInput();
         handler.processCommand("remove",InputParser.parseQuotedInput("0"));
 
-        assertTrue(library.getBooks().isEmpty());
+        assertTrue(library.getAssets().isEmpty());
         assertTrue(outContent.toString().contains("remove 0"));
     }
 
     @Test
     void processCommand_searchByTitle_findsBook() {
-        library.addBook(new Book("MyTitle", "Auth", 2000, BookStatus.EXIST));
+        library.addAsset(new Book("MyTitle", "Auth", 2000, BookStatus.EXIST));
         CommandHandler handler = createHandlerWithInput();
         handler.processCommand("search",InputParser.parseQuotedInput("title My"));
 
         String output = outContent.toString();
         assertTrue(output.contains("search title My"));
-        assertTrue(output.contains("0: Book"));
+        assertTrue(output.contains("0: Asset"));
     }
 
     @Test
     void processCommand_searchByAuthor_findsBook() {
-        library.addBook(new Book("Title", "SomeAuthor", 2000, BookStatus.EXIST));
+        library.addAsset(new Book("Title", "SomeAuthor", 2000, BookStatus.EXIST));
         CommandHandler handler = createHandlerWithInput();
         handler.processCommand("search", InputParser.parseQuotedInput("author Some"));
 
         String output = outContent.toString();
         assertTrue(output.contains("search author Some"));
-        assertTrue(output.contains("0: Book"));
+        assertTrue(output.contains("0: Asset"));
     }
 
     @Test
@@ -98,8 +101,8 @@ class CommandHandlerTest {
         File tempFile = File.createTempFile("books", ".txt");
         tempFile.deleteOnExit();
 
-        // Prepare library with a book
-        library.addBook(new Book("T", "A", 2000, BookStatus.EXIST));
+        // Prepare library with a asset
+        library.addAsset(new Book("T", "A", 2000, BookStatus.EXIST));
 
         // Write to file
         CommandHandler writeHandler = createHandlerWithInput();
@@ -109,13 +112,13 @@ class CommandHandlerTest {
         CommandHandler readHandler = createHandlerWithInput();
         readHandler.processCommand("read", InputParser.parseQuotedInput(tempFile.getAbsolutePath()));
 
-        assertEquals(1, library.getBooks().size());
-        assertEquals("T", library.getBook(0).getTitle());
+        assertEquals(1, library.getAssets().size());
+        assertEquals("T", library.getAsset(0).getTitle());
     }
 
     @Test
     void writeFile_shouldCreateDirectoriesAndSaveFile() throws IOException {
-        library.addBook(new Book("TestTitle", "TestAuthor", 2024, BookStatus.EXIST));
+        library.addAsset(new Book("TestTitle", "TestAuthor", 2024, BookStatus.EXIST));
 
         // Create path inside a temp folder that doesn't exist yet
         File tempDir = Files.createTempDirectory("librarytest").toFile();
@@ -132,19 +135,19 @@ class CommandHandlerTest {
         assertTrue(targetFile.exists(), "File should be created");
         String output = Files.readString(targetFile.toPath());
         System.out.println(targetFile.toPath());
-        assertTrue(output.contains("TestTitle"), "File should contain book data");
+        assertTrue(output.contains("TestTitle"), "File should contain asset data");
 
         // Cleanup
         tempDir.deleteOnExit();
     }
     @Test
     void processCommand_printall_printsBooks() {
-        library.addBook(new Book("T", "A", 2000, BookStatus.EXIST));
+        library.addAsset(new Book("T", "A", 2000, BookStatus.EXIST));
         CommandHandler handler = createHandlerWithInput();
         handler.processCommand("printall",InputParser.parseQuotedInput(""));
 
         assertTrue(outContent.toString().contains("printall"));
-        assertTrue(outContent.toString().contains("0: Book"));
+        assertTrue(outContent.toString().contains("0: Asset"));
     }
 
     @Test

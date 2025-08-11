@@ -1,4 +1,4 @@
-package org.example;
+package org.example.model;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,21 +24,21 @@ class BookTest {
 
     @Test
     void setTitle_updatesTitleAndReturnsSameBook() {
-        Book returned = book.setTitle("Harry Potter");
+        Book returned = (Book) book.setTitle("Harry Potter");
         assertSame(book, returned);
         assertEquals("Harry Potter", book.getTitle());
     }
 
     @Test
     void setAuthor_updatesAuthorAndReturnsSameBook() {
-        Book returned = book.setAuthor("Eric Arthur Blair");
+        Book returned = (Book) book.setAuthor("Eric Arthur Blair");
         assertSame(book, returned);
         assertEquals("Eric Arthur Blair", book.getAuthor());
     }
 
     @Test
     void setReleaseDate_updatesReleaseDateAndReturnsSameBook() {
-        Book returned = book.setReleaseDate(1945);
+        Book returned = (Book) book.setReleaseDate(1945);
         assertSame(book, returned);
         assertEquals(1945, book.getReleaseDate());
     }
