@@ -3,9 +3,11 @@ package org.example.controller;
 import org.example.model.*;
 import org.example.service.Library;
 import org.example.util.FieldHandler;
+import org.example.util.LinkedList2;
 
 import java.io.*;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class CommandHandler {
@@ -25,29 +27,41 @@ public class CommandHandler {
                 cmd = nextStrArg();
                 Asset asset = readAsset(cmd);
                 library.addAsset(asset);
-                fileOut.print("add " + cmd + " " + asset);
-                System.out.println(asset + " added");
+                printAndLog(asset + " added");
             }
 
             case "remove" -> {
                 var index = nextIntArg();
                 var asset = library.getAsset(index);
+                if (asset == null) {
+                    System.out.println("not found!!\nfirst search then remove");
+                    return;
+                }
                 library.removeAsset(asset);
-                System.out.println(asset + " removed");
-                fileOut.println("remove " + index);
+                printAndLog(asset + " removed");
             }
 
             case "edit" -> {
                 var oldAsset = library.getAsset(nextIntArg());
+                if (oldAsset == null) {
+                    System.out.println("not found!!\nfirst search then remove");
+                    return;
+                }
                 var newAsset = readAsset(oldAsset.getClass().getSimpleName());
-                fileOut.println("edit " + oldAsset + "->" + newAsset);
-                System.out.println(oldAsset + " edited to " + newAsset);
+                printAndLog(oldAsset + " edited to " + newAsset);
                 FieldHandler.copyFields(newAsset, oldAsset);
             }
 
             case "search" -> {
-                List<String> assetTypes = List.of(nextStrArg().split(" "));
-                List<String> fields = List.of(nextStrArg().split(" "));
+                List<String> assetTypes = Arrays.stream(nextStrArg().split(" "))
+                        .map(String::trim)
+                        .map((word) -> word.substring(0, 1).toUpperCase() + word.substring(1).toLowerCase())
+                        .collect(Collectors.toList());
+                List<String> fields = Arrays.stream(nextStrArg().split(" "))
+                        .map(String::trim)
+                        .map(String::toLowerCase)
+                        .map((word) -> word.equals("releasedate") ? "releaseDate" : word)
+                        .collect(Collectors.toList());
                 var searchTerm = nextStrArg();
                 fileOut.println("search " + fields + " in " + assetTypes);
                 handleSearch(assetTypes, fields, searchTerm);
@@ -63,6 +77,35 @@ public class CommandHandler {
                 var fileName = nextStrArg();
                 fileOut.println("write " + fileName);
                 writeFile(fileName);
+            }
+
+            case "sort" -> {
+                List<Asset> list=
+                switch (nextStrArg()) {
+                    case "all" -> library.getAssets();
+                    case "search" -> library.getSearchedAssets();
+                    default -> null;
+                };
+                if (list == null) {
+                    printAndLog("Invalid argument");
+                    return;
+                }
+                var comparator = switch (nextStrArg()){
+                    case "title" -> Comparator.comparing(Asset::getTitle);
+                    case "releasedate" -> Comparator.comparing(Asset::getReleaseDate);
+                    case "author" -> Comparator.comparing(Asset::getAuthor);
+                    default -> null;
+                };
+                if (comparator == null) {
+                    printAndLog("Invalid argument");
+                }
+                if (list.isEmpty())
+                {
+                    printAndLog("No assets found");
+                    return;
+                }
+                list.sort(comparator);
+                list.forEach(System.out::println);
             }
 
             case "printall" -> {
@@ -88,10 +131,8 @@ public class CommandHandler {
     }
 
     private void handleSearch(List<String> assetTypes, List<String> fields, String searchTerm) {
-        var filtered = FieldHandler.searchFields(library.getAssets(), fields, searchTerm);
-        filtered = filtered.stream().filter((asset) -> assetTypes.contains(asset.getClass().getSimpleName())).toList();
-        if (filtered.isEmpty()) System.out.println("No assets found !!!");
-        for (var asset : filtered) System.out.println(asset);
+        library.searchAssets(assetTypes, fields, searchTerm);
+        library.printSearchedAssets();
     }
 
     private Asset readAsset(String cmd) {
@@ -145,7 +186,8 @@ public class CommandHandler {
         printAndLog("add Thesis [Title] [Author] [Year]");
         printAndLog("remove [Index]");
         printAndLog("edit [Index] [Title] [Author] [Year] [Status]");
-        printAndLog("search [Magazine|Book|Reference|Thesis] [Title|Author|Year|Publisher|Status] [text]");
+        printAndLog("search [Magazine|Book|Reference|Thesis] [title|author|year|publisher|status] [text]");
+        printAndLog("sort [All|Search] [title|author|year]");
         printAndLog("read [File]");
         printAndLog("write [File]");
         printAndLog("printall");
@@ -162,10 +204,22 @@ public class CommandHandler {
     }
 
     private String nextStrArg() {
-        return Objects.requireNonNull(this.args.poll()).trim();
+        try {
+            return Objects.requireNonNull(this.args.poll()).trim();
+        } catch (NullPointerException e) {
+            printAndLog("No arguments provided !!!");
+            return "";
+        }
     }
 
     private int nextIntArg() {
-        return Integer.parseInt(nextStrArg());
+        var arg = nextStrArg();
+        try {
+            return Integer.parseInt(arg);
+        } catch (NumberFormatException e) {
+            printAndLog(arg + " is invalid argument !!!");
+            printAndLog("this should be an integer");
+            return -1;
+        }
     }
 }

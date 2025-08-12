@@ -1,5 +1,6 @@
 package org.example.util;
 
+import org.example.model.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -178,5 +179,43 @@ class LinkedList2Test {
         list.add(null);
         assertTrue(list.contains(null));
         assertNull(list.get(0));
+    }
+
+    @Test
+    void testMergeSortInteger()
+    {
+        var list = new LinkedList2<Integer>();
+        list.add(2);
+        list.add(4);
+        list.add(5);
+        list.add(8);
+        list.add(-5);
+        list.add(-8);
+        System.out.println(list);
+        list.sortList(Integer::compare);
+        System.out.println(list);
+    }
+
+    @Test
+    void testMergeSortAsset()
+    {
+        var list = new LinkedList2<Asset>();
+        list.add(new Book("book 1","author 1",1920, BookStatus.BORROWED));
+        list.add(new Book("book 2","author 2",1925, BookStatus.EXIST));
+        list.add(new Thesis("Thesis 3","author 3",1930));
+        list.add(new Thesis("Thesis 4","author 4",2000));
+        list.add(new Reference("Reference 5","author 5",1900));
+        list.add(new Reference("Reference 6","author 6",1903));
+        list.add(new Magazine("Magazine 7","author 7",1820, "publisher 7"));
+        list.add(new Magazine("Magazine 8","author 8",1844, "publisher 8"));
+        for  (Asset asset : list) {
+            System.out.println(asset);
+        }
+        list.sortList(Comparator.comparing(Asset::getReleaseDate));
+        System.out.println();
+        System.out.println();
+        for  (Asset asset : list) {
+            System.out.println(asset);
+        }
     }
 }

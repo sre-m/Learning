@@ -1,15 +1,5 @@
 package org.example.util;
 
-import org.example.model.Asset;
-import org.example.model.Book;
-
-import java.lang.reflect.Field;
-import java.util.List;
-
-import org.example.model.Asset;
-import org.example.model.Book;
-import org.example.util.LinkedList2;
-
 import java.lang.reflect.Field;
 import java.util.List;
 
@@ -62,7 +52,6 @@ public class FieldHandler {
         return results;
     }
 
-    // Helper method to also search fields in nested classes (like Author)
     private static Field getFieldRecursive(Class<?> clazz, String fieldName) {
         try {
             return clazz.getDeclaredField(fieldName);
@@ -73,4 +62,5 @@ public class FieldHandler {
             return null;
         }
     }
+
 }

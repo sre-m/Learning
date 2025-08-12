@@ -1,4 +1,6 @@
-package org.example.util;
+package org.example.util.IO;
+
+import org.example.util.LinkedList2;
 
 import java.util.Queue;
 import java.util.regex.Matcher;

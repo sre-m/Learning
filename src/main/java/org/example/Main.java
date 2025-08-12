@@ -3,7 +3,7 @@ package org.example;
 import org.example.controller.CommandHandler;
 import org.example.service.Library;
 import org.example.util.AppConfig;
-import org.example.util.InputParser;
+import org.example.util.IO.InputParser;
 
 import java.io.*;
 import java.util.*;

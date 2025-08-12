@@ -26,7 +26,7 @@ public class Magazine extends Asset {
 
     @Override
     public String toCSV() {
-        return "Reference," + getTitle() + "," + getAuthor() + "," + getReleaseDate() + "," + getPublisher();
+        return "Magazine," + getTitle() + "," + getAuthor() + "," + getReleaseDate() + "," + getPublisher();
     }
 
     @Override

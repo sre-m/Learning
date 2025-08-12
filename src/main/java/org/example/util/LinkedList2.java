@@ -161,8 +161,7 @@ public class LinkedList2<T> extends AbstractSequentialList<T> implements List<T>
             @Override
             public void remove() {
                 if (lastReturned == null) throw new IllegalStateException();
-                prev.next = current.next;
-//                LinkedList2.this.removeByIndex(pos - (current == lastReturned.next ? 1 : 0));
+                LinkedList2.this.removeByIndex(pos - (current == lastReturned.next ? 1 : 0));
                 if (current == lastReturned) current = current.next;
                 lastReturned = null;
                 pos--;
@@ -349,5 +348,61 @@ public class LinkedList2<T> extends AbstractSequentialList<T> implements List<T>
         for (T item : this) list.add(item);
         Collections.reverse(list);
         return list.iterator();
+    }
+
+    // Sort Algorithm
+
+    public void sortList(Comparator<T> comparator) {
+        this.head = mergeSort(this.head, comparator);
+    }
+
+    public Node<T> mergeSort(Node<T> head, Comparator<T> comparator) {
+        Node<T> middle = getMiddle(head);
+        Node<T> middleNext;
+        if (middle == null) return head;
+        middleNext = middle.next;
+        middle.next = null;
+        head = mergeSort(head, comparator);
+        middle = mergeSort(middleNext, comparator);
+        return merge(head,middle,comparator);
+    }
+
+    private Node<T> merge(Node<T> n1, Node<T> n2, Comparator<T> comparator) {
+        Node<T> head;
+        Node<T> current;
+        if (comparator.compare(n1.data, n2.data) <= 0) {
+            head = current = n1;
+            n1 = n1.next;
+        } else {
+            head = current = n2;
+            n2 = n2.next;
+        }
+        while (n1 != null && n2 != null) {
+            if (comparator.compare(n1.data, n2.data) <= 0) {
+                current.next = n1;
+                n1 = n1.next;
+            } else {
+                current.next = n2;
+                n2 = n2.next;
+            }
+            current = current.next;
+        }
+        if (n1 == null) {
+            current.next = n2;
+        } else {
+            current.next = n1;
+        }
+        return head;
+    }
+
+    private Node<T> getMiddle(Node<T> node) {
+        if (node == null || node.next == null) return null;
+        Node<T> slow = node;
+        Node<T> fast = node;
+        while (fast.next != null && fast.next.next != null) {
+            slow = slow.next;
+            fast = fast.next.next;
+        }
+        return slow;
     }
 }
